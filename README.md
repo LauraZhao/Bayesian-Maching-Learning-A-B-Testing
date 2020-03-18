@@ -1,2 +1,3 @@
 # Bayesian-Maching-Learning-A-B-Testing
 Some notes and some codes about what I've learned about the Bayesian Machine Learning
+Here I share some notes and some codes about what I've learned about the Bayesian Machine Learning. First is a brief review of t-test and chi-square test, where I review the concept and the formula used in these two test. Secondly, in Bayesian_bandit, I create class and define some functions to simulate the bandit machine and to see how distribution has changed along with the increase of our trial. Finally, the Thompson_Sampling converge is a simulation of Thompson Sampling, where I calculate the accumulative average click through rate, so see how using Thompson Sampling can bring us to the best outcome.
