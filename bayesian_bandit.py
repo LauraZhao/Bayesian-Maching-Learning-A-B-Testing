@@ -1,0 +1,72 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Mar 17 20:57:00 2020
+
+@author: zhaor
+"""
+
+from __future__ import print_function, division
+from builtins import range
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.stats import beta
+
+
+NUM_TRIALS = 2000
+BANDIT_PROBABILITIES = [0.2, 0.5, 0.75]        #we are testing 3 bandits here.
+
+
+class Bandit(object):                         #create class "Bandit"
+  def __init__(self, p):
+    self.p = p                                #probability of giving a reward
+    self.a = 1                                #parameter a in beta distribution
+    self.b = 1                                #parameter b in beta distribution
+
+  def pull(self):
+    return np.random.random() < self.p        #pull function: return 1 or 0 (if we get a reward from this pull)
+
+  def sample(self):
+    return np.random.beta(self.a, self.b)     #sample function: draw a sample from the current beta distribution
+
+  def update(self, x):                        #update function: update the parameter after the pull
+    self.a += x
+    self.b += 1 - x
+
+
+def plot(bandits, trial):                     #plot function: plot the bandit distribution after some times of trials for each bandit.
+  x = np.linspace(0, 1, 200)                  #to see the change of the distribution as we plays the bandit more and more times.
+  for b in bandits:                           #and also see how far the estimated probability is away from the real probability.
+    y = beta.pdf(x, b.a, b.b)
+    plt.plot(x, y, label="real p: %.4f" % b.p)
+  plt.title("Bandit distributions after %s trials" % trial)
+  plt.legend()
+  plt.show()
+
+
+def experiment():                                        #experiment function: create 3 bandits with probabilities of giving a reward:
+  bandits = [Bandit(p) for p in BANDIT_PROBABILITIES]    #[0.2, 0.5, 0.75]
+
+  sample_points = [5,10,20,50,100,200,500,1000,1500,1999]   #that's the trials we want to plot out.
+  for i in range(NUM_TRIALS):
+   
+    bestb = None                             #take a sample from each bandit
+    maxsample = -1
+    allsamples = []                          #collect these just to print for debugging
+    for b in bandits:
+      sample = b.sample()
+      allsamples.append("%.4f" % sample)
+      if sample > maxsample:
+        maxsample = sample
+        bestb = b                            #we compare the sample from those 3 bandits and we choose the bandit that gives us the 
+    if i in sample_points:                   #highest sample. Then we pull that bandit.
+      print("current samples: %s" % allsamples)
+      plot(bandits, i)
+
+    x = bestb.pull()                         #pull the arm for the bandit with the largest sample
+    bestb.update(x)                          #update the distribution for the bandit whose arm we just pulled
+
+
+if __name__ == "__main__":
+  experiment()
